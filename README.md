@@ -156,3 +156,10 @@ so that the released code matches the published numbers.
   year    = {2026}
 }
 ```
+
+## License
+
+The code is released under the MIT License (see `LICENSE`). The dataset is not
+included and remains subject to the terms of its providers (KMA, WMO GTS).
+Pretrained backbones loaded through timm and the LPIPS weights follow their own
+licenses.

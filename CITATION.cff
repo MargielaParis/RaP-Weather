@@ -1,6 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this code, please cite the paper below."
 title: "RaP-Weather"
+license: MIT
 authors:
   - family-names: Park
     given-names: Ki-Yeon
