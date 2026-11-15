@@ -1,0 +1,18 @@
+{
+  "protocol": "per-query bootstrap (2000, seed 42) + per-query paired Wilcoxon + Holm per family",
+  "future_pool_queries": 5143,
+  "model_selection_queries_removed": 200,
+  "confirmatory_queries": 4943,
+  "main_family_tests": 150,
+  "main_family_holm_significant": 137,
+  "cells_rap_lowest_mean": 23,
+  "cells_rap_beats_all": 16,
+  "cells_rap_significant_loss": 0,
+  "per_region_family_tests": 72,
+  "per_region_cells_with_significant_winner": 2,
+  "visual_family_tests": 216,
+  "selection_first_datetime": "201806060900",
+  "selection_last_datetime": "202003230000",
+  "confirmatory_first_datetime": "201806040600",
+  "confirmatory_last_datetime": "202003311800"
+}
