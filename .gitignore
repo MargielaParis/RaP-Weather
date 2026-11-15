@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Data and outputs (not distributed)
+data/*
+!data/README.md
+runs/
+*.hdf5
+*.h5
+*.pkl
+*.pth
+*.pt
+*.npz
+*.log
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+.claude/

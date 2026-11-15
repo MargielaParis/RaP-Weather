@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "RaP-Weather"
+authors:
+  - family-names: Park
+    given-names: Ki-Yeon
+    affiliation: "Department of Computer Science, Kookmin University"
+  - family-names: Park
+    given-names: Ha-Myung
+    affiliation: "Department of Computer Science, Kookmin University"
+preferred-citation:
+  type: article
+  title: "No Crop, No Recompute: Region-Aware Satellite Image Sequence Embeddings for Scalable Weather Retrieval"
+  authors:
+    - family-names: Park
+      given-names: Ki-Yeon
+    - family-names: Park
+      given-names: Ha-Myung
+  journal: "IEEE Access"
+  year: 2026

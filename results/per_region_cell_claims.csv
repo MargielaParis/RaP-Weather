@@ -1,0 +1,25 @@
+Scope,Top-k,Per-region lower mean,Per-region significantly better,RaP beats all per-region
+south_korea,1,CLIP (per-region),CLIP (per-region),False
+south_korea,3,CLIP (per-region),CLIP (per-region),False
+south_korea,5,,,False
+south_korea,10,,,False
+south_korea,50,,,True
+south_korea,100,,,True
+south_korea_wide,1,DINOv2 (per-region),,False
+south_korea_wide,3,,,False
+south_korea_wide,5,,,False
+south_korea_wide,10,,,True
+south_korea_wide,50,,,True
+south_korea_wide,100,,,True
+low_left,1,DINOv2 (per-region),,False
+low_left,3,,,False
+low_left,5,,,False
+low_left,10,,,False
+low_left,50,,,True
+low_left,100,,,True
+total_patches,1,DINOv2 (per-region),,False
+total_patches,3,,,False
+total_patches,5,,,False
+total_patches,10,,,False
+total_patches,50,,,True
+total_patches,100,,,True
