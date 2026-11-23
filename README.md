@@ -26,7 +26,7 @@ time.
 
 - **No crop, no recompute.** One encoder pass per image serves every region.
 - **126x faster** than the crop-and-re-encode pipeline with DINOv2.
-- **Lowest weather-observation MSE in 23 of 24** combinations of query configuration and ranking depth. No baseline is significantly better in any of them.
+- **Lowest weather-observation MSE in 23 of 24** region and ranking-depth combinations on 4,943 held-out queries, among methods that support arbitrary regions without per-region training. No such baseline is significantly better in any combination.
 
 ## Method
 
