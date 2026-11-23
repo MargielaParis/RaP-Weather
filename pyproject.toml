@@ -8,6 +8,7 @@ version = "1.0.0"
 description = "Region-aware patch embeddings for satellite image sequence retrieval (IEEE Access)"
 readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
 authors = [
     { name = "Ki-Yeon Park" },
     { name = "Ha-Myung Park" },
