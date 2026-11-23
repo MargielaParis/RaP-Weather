@@ -1,51 +1,57 @@
+<div align="center">
+
 # RaP-Weather
 
-Code for the paper
+### No Crop, No Recompute: Region-Aware Satellite Image Sequence Embeddings for Scalable Weather Retrieval
 
-> Ki-Yeon Park and Ha-Myung Park. **No Crop, No Recompute: Region-Aware Satellite Image Sequence Embeddings for Scalable Weather Retrieval.** *IEEE Access*, 2026.
+[Ki-Yeon Park](https://github.com/MargielaParis), Ha-Myung Park<br>
+Department of Computer Science, Kookmin University
+
+[![Paper](https://img.shields.io/badge/IEEE_Access-2026-00629B?style=flat-square)](https://doi.org/10.1109/ACCESS.2026.3755103) [![License: MIT](https://img.shields.io/badge/License-MIT-555555?style=flat-square)](LICENSE) ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-2.6-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
+
+<br>
+
+<img src="assets/teaser.png" width="92%" alt="Traditional crop-and-re-encode retrieval compared with RaP-Weather patch selection">
+
+<sub>Traditional pipelines crop and re-encode every database image for each region query. RaP-Weather selects the region's patches from precomputed embeddings.</sub>
+
+</div>
+
+## Overview
 
 RaP-Weather encodes each satellite image once into a grid of compact patch
 embeddings (196 patches x D dimensions) and answers a query for any region by
 selecting that region's patches. No cropping or re-encoding happens at query
-time. The encoder is a ViT with LoRA adapters and an MLP bottleneck, trained
-with a spatio-temporal prediction objective (predict the next 3-hour frame
-from 6 past frames) combined with an InfoNCE term.
+time.
 
-## Repository layout
+- **No crop, no recompute.** One encoder pass per image serves every region.
+- **126x faster** than the crop-and-re-encode pipeline with DINOv2.
+- **Lowest weather-observation MSE in 23 of 24** combinations of query configuration and ranking depth. No baseline is significantly better in any of them.
 
-| Path | Content |
-|---|---|
-| `rap_weather/config.py` | All hyperparameters and paths (single source of truth) |
-| `rap_weather/models.py` | Patch auto-encoder, spatio-temporal forecaster, weather-vector loading and cleaning |
-| `rap_weather/regions.py` | Query regions as patch indices and pixel boxes |
-| `rap_weather/train.py`, `sanity_checks_and_save.py` | Training and retrieval-database construction |
-| `rap_weather/eval_setup.py` | Chronological split, retrieval scores, bootstrap CIs (shared by every evaluation) |
-| `rap_weather/eval_mse_retrieval.py` | Weather-observation MSE of retrieved images |
-| `rap_weather/eval_image_quality.py` | LPIPS, PSNR, SSIM of retrieved images |
-| `rap_weather/benchmark_query_time.py` | Query processing time |
-| `rap_weather/baselines/` | Group 1 (off-the-shelf encoders), per-region fine-tuned encoders, unified comparison |
-| `rap_weather/studies/` | D ablation, positional-encoding ablation, seasonal generalization, Pixel-NN, downsampling, storage cost |
-| `scripts/` | Runnable experiments: Group 2 and full-dimension baselines, Pixel-NN per-query results, visual metrics, hyperparameter sweeps, single-image variant, figures |
-| `analysis/` | Confirmatory statistics, LaTeX tables and paper figures from saved per-query results (no torch needed) |
-| `results/` | Statistics CSVs behind the paper tables |
-| `data/` | Expected dataset files (not distributed, see `data/README.md`) |
+## Method
 
-### Baseline names in code and paper
+<p align="center">
+  <img src="assets/pipeline.png" width="88%" alt="RaP-Weather training and embedding pipeline">
+</p>
 
-The comparison groups were renumbered in the paper after the code was
-written. File names and result keys keep the code names.
+A ViT with LoRA adapters extracts patch features, and an MLP bottleneck
+compresses each patch to a D-dimensional embedding. A Transformer predicts the
+embedding of the next 3-hour frame from 6 past frames. Training combines a
+cosine prediction loss with an InfoNCE term, so the embeddings encode cloud
+movement and intensification.
 
-| Paper | Code |
-|---|---|
-| Group 1 (off-the-shelf, frozen) | `rap_weather/baselines/group1_offshelf_baseline.py`, keys `... (Group1, off-the-shelf)` |
-| Group 2 (trained on whole images, region cropped at query) | `scripts/group3_fulldim.py` (paper version), `scripts/group3_wholetrain_crop.py` (D=8 projection variant), keys `... (G3: whole-trained, crop@query)` and `... (Group2, whole-image fine-tuned)` for the full-image query |
-| Per-region fine-tuned encoders (Appendix B) | `scripts/group2_fulldim_ablation.py` (paper version), `rap_weather/baselines/group2_finetuned_baseline.py`, keys `... (per-region)` |
-| Pixel-NN | `scripts/pixel_nn_perquery.py`, `rap_weather/studies/baseline_comparison.py` |
+## Example
+
+<p align="center">
+  <img src="assets/qualitative_lingling.jpg" width="88%" alt="Top-5 retrievals for a cropped query of typhoon Lingling">
+</p>
+
+<p align="center"><sub>Cropped query of typhoon Lingling (2019). RaP-Weather retrieves the similar typhoon Bolaven (2012) at ranks 1 to 3. The off-the-shelf encoders do not retrieve it.</sub></p>
 
 ## Setup
 
 ```bash
-git clone <this repository>
+git clone https://github.com/MargielaParis/RaP-Weather.git
 cd RaP-Weather
 pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu118
 pip install -r requirements.txt
@@ -102,6 +108,9 @@ All commands run from the repository root.
    python scripts/regen_paper_figures.py
    ```
 
+<details>
+<summary><b>Paper tables and figures by script</b></summary>
+
 | Paper item | Produced by |
 |---|---|
 | Table 1 (implementation details) | `rap_weather/config.py`, `analysis/make_tables.py` |
@@ -117,6 +126,8 @@ All commands run from the repository root.
 Table 6 (end-to-end query processing time against PSNR, SSIM and the
 deep-learning pipelines) was measured with an earlier notebook version of the
 pipeline and is not reproduced by this repository.
+
+</details>
 
 ### Evaluation protocol
 
@@ -146,6 +157,40 @@ so that the released code matches the published numbers.
   version of the pipeline that is not included here. `scripts/eval_single_image.py`
   evaluates its checkpoint, given through `RAP_SINGLE_CKPT` and `RAP_SINGLE_PKL`.
 
+<details>
+<summary><b>Repository layout</b></summary>
+
+| Path | Content |
+|---|---|
+| `rap_weather/config.py` | All hyperparameters and paths (single source of truth) |
+| `rap_weather/models.py` | Patch auto-encoder, spatio-temporal forecaster, weather-vector loading and cleaning |
+| `rap_weather/regions.py` | Query regions as patch indices and pixel boxes |
+| `rap_weather/train.py`, `sanity_checks_and_save.py` | Training and retrieval-database construction |
+| `rap_weather/eval_setup.py` | Chronological split, retrieval scores, bootstrap CIs (shared by every evaluation) |
+| `rap_weather/eval_mse_retrieval.py` | Weather-observation MSE of retrieved images |
+| `rap_weather/eval_image_quality.py` | LPIPS, PSNR, SSIM of retrieved images |
+| `rap_weather/benchmark_query_time.py` | Query processing time |
+| `rap_weather/baselines/` | Group 1 (off-the-shelf encoders), per-region fine-tuned encoders, unified comparison |
+| `rap_weather/studies/` | D ablation, positional-encoding ablation, seasonal generalization, Pixel-NN, downsampling, storage cost |
+| `scripts/` | Runnable experiments: Group 2 and full-dimension baselines, Pixel-NN per-query results, visual metrics, hyperparameter sweeps, single-image variant, figures |
+| `analysis/` | Confirmatory statistics, LaTeX tables and paper figures from saved per-query results (no torch needed) |
+| `results/` | Statistics CSVs behind the paper tables |
+| `data/` | Expected dataset files (not distributed, see `data/README.md`) |
+
+#### Baseline names in code and paper
+
+The comparison groups were renumbered in the paper after the code was
+written. File names and result keys keep the code names.
+
+| Paper | Code |
+|---|---|
+| Group 1 (off-the-shelf, frozen) | `rap_weather/baselines/group1_offshelf_baseline.py`, keys `... (Group1, off-the-shelf)` |
+| Group 2 (trained on whole images, region cropped at query) | `scripts/group3_fulldim.py` (paper version), `scripts/group3_wholetrain_crop.py` (D=8 projection variant), keys `... (G3: whole-trained, crop@query)` and `... (Group2, whole-image fine-tuned)` for the full-image query |
+| Per-region fine-tuned encoders (Appendix B) | `scripts/group2_fulldim_ablation.py` (paper version), `rap_weather/baselines/group2_finetuned_baseline.py`, keys `... (per-region)` |
+| Pixel-NN | `scripts/pixel_nn_perquery.py`, `rap_weather/studies/baseline_comparison.py` |
+
+</details>
+
 ## Citation
 
 ```bibtex
@@ -153,7 +198,8 @@ so that the released code matches the published numbers.
   title   = {No Crop, No Recompute: Region-Aware Satellite Image Sequence Embeddings for Scalable Weather Retrieval},
   author  = {Park, Ki-Yeon and Park, Ha-Myung},
   journal = {IEEE Access},
-  year    = {2026}
+  year    = {2026},
+  doi     = {10.1109/ACCESS.2026.3755103}
 }
 ```
 
